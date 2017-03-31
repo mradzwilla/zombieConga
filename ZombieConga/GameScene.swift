@@ -14,12 +14,15 @@ class GameScene: SKScene {
     let zombieMovePointsPerSec: CGFloat = 480.0
     let zombieAnimation: SKAction
     var lastTouchedLocation = CGPoint(x:0,y:0)
+    var isZombieInvincible = false
     
     let playableRect: CGRect
     
     var velocity = CGPoint(x:0,y:0)
     var lastUpdateTime: TimeInterval = 0
     var dt: TimeInterval = 0
+    let catCollisionSound: SKAction = SKAction.playSoundFileNamed( "hitCat.wav", waitForCompletion: false)
+    let enemyCollisionSound: SKAction = SKAction.playSoundFileNamed( "hitCatLady.wav", waitForCompletion: false)
     
     override init(size: CGSize) {
         let maxAspectRatio:CGFloat = 16.0/9.0
@@ -208,9 +211,33 @@ class GameScene: SKScene {
     
     func zombieHitCat(cat: SKSpriteNode) {
         cat.removeFromParent()
+        run(catCollisionSound)
     }
     func zombieHitEnemy(enemy: SKSpriteNode) {
-        enemy.removeFromParent()
+        //enemy.removeFromParent()
+        
+        if !(isZombieInvincible){
+            blinkZombie()
+            run(enemyCollisionSound)
+        }
+    }
+    
+    func blinkZombie(){
+        let zombie = self.zombie
+        isZombieInvincible = true
+        let blinkTimes = 10.0
+        let duration = 3.0
+        let blinkAction = SKAction.customAction(withDuration: duration) {
+            node, elapsedTime in
+            let slice = duration / blinkTimes
+            let remainder = Double(elapsedTime).truncatingRemainder(dividingBy: slice)
+            node.isHidden = remainder > slice / 2
+        }
+        zombie.run(blinkAction, completion: {
+            print("Zombie not invincible")
+            self.isZombieInvincible = false
+        })
+        
     }
     func checkCollisions() {
         var hitCats: [SKSpriteNode] = []
@@ -224,14 +251,19 @@ class GameScene: SKScene {
             zombieHitCat(cat: cat)
         }
         var hitEnemies: [SKSpriteNode] = []
-        enumerateChildNodes(withName: "enemy") { node, _ in
-            let enemy = node as! SKSpriteNode
-            if node.frame.insetBy(dx: 20, dy: 20).intersects(
-                self.zombie.frame) {
-                hitEnemies.append(enemy) }
+        
+        if !(isZombieInvincible){
+            enumerateChildNodes(withName: "enemy") { node, _ in
+                let enemy = node as! SKSpriteNode
+                if node.frame.insetBy(dx: 20, dy: 20).intersects(
+                    self.zombie.frame) {
+                    hitEnemies.append(enemy)
+                }
+            }
+            for enemy in hitEnemies {
+                zombieHitEnemy(enemy: enemy)
+            }
         }
-        for enemy in hitEnemies {
-            zombieHitEnemy(enemy: enemy) }
     }
     
 }
