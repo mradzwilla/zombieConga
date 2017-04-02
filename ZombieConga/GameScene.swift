@@ -16,6 +16,8 @@ class GameScene: SKScene {
     var lastTouchedLocation = CGPoint(x:0,y:0)
     var isZombieInvincible = false
     
+    let catMovePointsPerSec: CGFloat = 480.0
+    
     let playableRect: CGRect
     
     var velocity = CGPoint(x:0,y:0)
@@ -153,6 +155,8 @@ class GameScene: SKScene {
         addChild(background)
         
         zombie.position = CGPoint(x:400, y:400)
+        zombie.zPosition = 100
+        
         addChild(zombie)
         //zombie.run(zombieAnimation)
         
@@ -175,6 +179,7 @@ class GameScene: SKScene {
         boundsCheckZombie()
         //checkCollisions()
         rotateSprite(sprite: zombie, direction: velocity)
+        moveTrain()
     }
     
     override func didEvaluateActions() {
@@ -210,12 +215,16 @@ class GameScene: SKScene {
     }
     
     func zombieHitCat(cat: SKSpriteNode) {
-        cat.removeFromParent()
+        cat.name = "train"
+        cat.removeAllActions()
+        cat.zRotation = 0
+        cat.setScale(1)
+        cat.color = .green
+        cat.colorBlendFactor = 0.7
+        
         run(catCollisionSound)
     }
     func zombieHitEnemy(enemy: SKSpriteNode) {
-        //enemy.removeFromParent()
-        
         if !(isZombieInvincible){
             blinkZombie()
             run(enemyCollisionSound)
@@ -266,4 +275,19 @@ class GameScene: SKScene {
         }
     }
     
+    func moveTrain() {
+        var targetPosition = zombie.position
+        enumerateChildNodes(withName: "train") { node, _ in
+            if !node.hasActions() {
+                let actionDuration = 0.3
+                let offset = (targetPosition - node.position)
+                let direction = offset.normalized()
+                let amountToMovePerSec = direction * self.catMovePointsPerSec
+                let amountToMove = amountToMovePerSec * CGFloat(actionDuration)
+                let moveAction = SKAction.moveBy(x: amountToMove.x, y: amountToMove.y, duration: actionDuration)
+                self.rotateSprite(sprite: node as! SKSpriteNode, direction: direction)
+                node.run(moveAction)
+            }
+            targetPosition = node.position }
+    }
 }

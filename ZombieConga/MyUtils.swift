@@ -47,7 +47,7 @@ func /= ( point: inout CGPoint, scalar: CGFloat) {
     point = point / scalar
 }
 
-let π = CGFloat(M_PI)
+let π = CGFloat(Double.pi)
 
 func shortestAngleBetween(angle1: CGFloat,
                           angle2: CGFloat) -> CGFloat {
@@ -93,5 +93,9 @@ extension CGPoint {
     var angle: CGFloat {
         return atan2(y, x)
     }
+}
+
+func SDistanceBetweenPoints(first: CGPoint, second: CGPoint) -> CGFloat {
+    return CGFloat(hypotf(Float(second.x - first.x), Float(second.y - first.y)));
 }
 
