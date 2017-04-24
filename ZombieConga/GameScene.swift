@@ -11,7 +11,7 @@ import SpriteKit
 class GameScene: SKScene {
     
     let zombie = SKSpriteNode(imageNamed: "zombie1")
-    let zombieMovePointsPerSec: CGFloat = 480.0
+    let zombieMovePointsPerSec: CGFloat = 600.0
     let zombieAnimation: SKAction
     let backgroundMovePointsPerSec: CGFloat = 200.0
     let backgroundLayer = SKNode()
@@ -119,15 +119,15 @@ class GameScene: SKScene {
     
     func spawnEnemy() {
         let enemy = SKSpriteNode(imageNamed: "enemy")
-        enemy.position = CGPoint(
-            x: size.width + enemy.size.width/2, y: CGFloat.random(
-                min: playableRect.minY + enemy.size.height/2,
-                max: playableRect.maxY - enemy.size.height/2)
-        )
+        let enemyScenePos = CGPoint(x: size.width + enemy.size.width / 2.0, y: CGFloat.random(min: playableRect.minY + enemy.size.height / 2.0, max: playableRect.maxY - enemy.size.height / 2.0))
+
+        enemy.position = backgroundLayer.convert(enemyScenePos, from: self)
+
         enemy.name = "enemy"
         backgroundLayer.addChild(enemy)
-        
-        let actionMove = SKAction.moveTo(x: -enemy.size.width/2, duration: 2.0)
+        let enemySceneDestination = CGPoint(x: -enemy.size.width/2, y: enemy.position.y)
+        let enemyDestination = backgroundLayer.convert(enemySceneDestination, from: self)
+        let actionMove = SKAction.moveTo(x: enemyDestination.x, duration: 2.0)
         let actionRemove = SKAction.removeFromParent()
         enemy.run(SKAction.sequence([actionMove, actionRemove]))
     }
@@ -171,7 +171,7 @@ class GameScene: SKScene {
         backgroundLayer.addChild(zombie)
         
         startZombieAnimation()
-        //debugDrawPlayableArea()
+//        debugDrawPlayableArea()
         run(SKAction.repeatForever( SKAction.sequence([SKAction.run(spawnEnemy), SKAction.wait(forDuration: 2.0)])))
         run(SKAction.repeatForever( SKAction.sequence([SKAction.run(spawnCat), SKAction.wait(forDuration: 1.0)])))
     }
@@ -209,9 +209,8 @@ class GameScene: SKScene {
     
     func spawnCat() {
         let cat = SKSpriteNode(imageNamed: "cat")
-        cat.position = CGPoint(
-            x: CGFloat.random(min: playableRect.minX, max: playableRect.maxX),
-            y: CGFloat.random(min: playableRect.minY, max: playableRect.maxY))
+        let catScenePos = CGPoint(x: CGFloat.random(min: playableRect.minX, max: playableRect.maxX), y: CGFloat.random(min: playableRect.minY, max: playableRect.maxY))
+        cat.position = backgroundLayer.convert(catScenePos, from: self)
         cat.name = "cat"
         cat.setScale(0)
         backgroundLayer.addChild(cat)
@@ -266,7 +265,6 @@ class GameScene: SKScene {
             node.isHidden = remainder > slice / 2
         }
         zombie.run(blinkAction, completion: {
-            print("Zombie not invincible")
             self.isZombieInvincible = false
         })
         
@@ -378,7 +376,7 @@ class GameScene: SKScene {
         
         backgroundLayer.enumerateChildNodes(withName: "background") { node, _ in
             let background = node as! SKSpriteNode
-            let backgroundScreenPos = self.backgroundLayer.convertPoint( background.position, toNode: self)
+            let backgroundScreenPos = self.backgroundLayer.convert( background.position, to: self)
             if backgroundScreenPos.x <= -background.size.width {
                 background.position = CGPoint(
                     x: background.position.x + background.size.width*2, y: background.position.y)

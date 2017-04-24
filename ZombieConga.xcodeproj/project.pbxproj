@@ -134,6 +134,7 @@
 				TargetAttributes = {
 					436D21761E89B7BC002A3B29 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = MHY37T985C;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -308,6 +309,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = MHY37T985C;
 				INFOPLIST_FILE = ZombieConga/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.theswiftproject.ZombieConga;
@@ -320,6 +322,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = MHY37T985C;
 				INFOPLIST_FILE = ZombieConga/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.theswiftproject.ZombieConga;
